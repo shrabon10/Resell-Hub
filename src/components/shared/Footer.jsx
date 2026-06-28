@@ -110,7 +110,7 @@ export default function Footer() {
                   </li>
                   <li className="flex items-center gap-3">
                     <Mail className="h-5 w-5 shrink-0 text-[#3E5F47]" />
-                    <a href="mailto:hello@neomarket.com" className="transition-colors hover:text-white">hello@neomarket.com</a>
+                    <a href="mailto:hello@resellhub.com" className="transition-colors hover:text-white">hello@resellhub.com</a>
                   </li>
                 </ul>
               </div>
@@ -120,7 +120,7 @@ export default function Footer() {
 
         <FadeIn>
           <div className="mt-16 border-t border-[#273B2D] pt-8 text-center text-sm text-[#B0B3A6]">
-            <p>&copy; {currentYear} NeoMarket. All rights reserved.</p>
+            <p>&copy; {currentYear} Resell-Hub. All rights reserved.</p>
           </div>
         </FadeIn>
       </div>

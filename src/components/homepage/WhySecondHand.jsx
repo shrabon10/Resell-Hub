@@ -10,10 +10,6 @@ const featured = {
     "Every curated exchange breaks the linear take-make-waste cycle, redirecting premium materials away from the global discard stream and transforming waste into structural permanency.",
 };
 
-
-
-
-
 const benefits = [
   {
     icon: Trees,
