@@ -319,21 +319,43 @@ const SignUpPage = () => {
             </div>
 
             {/* Select Role Dropdown */}
-            <motion.div variants={itemVariants} className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/90">Select Role</label>
-              <Select onValueChange={(value) => setRoleState(value)} disabled={loading}>
-                <SelectTrigger className="w-full h-11 rounded-xl bg-background/30 backdrop-blur-md border-input focus:ring-2 focus:ring-primary/20 transition-all">
-                  <SelectValue placeholder="Select account matrix" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border border-border/60 bg-popover/90 backdrop-blur-lg shadow-xl">
-                  <SelectGroup>
-                    <SelectItem value="buyer" className="rounded-lg font-medium cursor-pointer focus:bg-primary focus:text-primary-foreground">Buyer</SelectItem>
-                    <SelectItem value="seller" className="rounded-lg font-medium cursor-pointer focus:bg-primary focus:text-primary-foreground">Seller</SelectItem>
-                    <SelectItem value="admin" className="rounded-lg font-medium cursor-pointer focus:bg-primary focus:text-primary-foreground">Admin</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </motion.div>
+            <motion.div variants={itemVariants} className="space-y-2">
+  {/* Label: Enhanced contrast and spacing */}
+  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+    Select Role
+  </label>
+  
+  <Select onValueChange={(value) => setRoleState(value)} disabled={loading}>
+    {/* Trigger: Cleaned up blur opacity for better readability */}
+    <SelectTrigger className="w-full h-11 rounded-xl bg-background/60 backdrop-blur-md border border-input/80 px-3.5 text-sm font-medium text-foreground hover:bg-background/80 focus:ring-2 focus:ring-primary/20 transition-all">
+      <SelectValue placeholder="Select account matrix" />
+    </SelectTrigger>
+    
+    {/* Content Menu: Higher background opacity and strict border to prevent transparency bleed */}
+    <SelectContent className="rounded-xl border border-border/80 bg-popover/98 backdrop-blur-xl shadow-2xl p-1 animate-in fade-in-80 slide-in-from-top-1">
+      <SelectGroup>
+        <SelectItem 
+          value="buyer" 
+          className="rounded-lg text-sm font-medium text-foreground cursor-pointer py-2.5 px-3 current-color transition-colors focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary"
+        >
+          Buyer
+        </SelectItem>
+        <SelectItem 
+          value="seller" 
+          className="rounded-lg text-sm font-medium text-foreground cursor-pointer py-2.5 px-3 current-color transition-colors focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary"
+        >
+          Seller
+        </SelectItem>
+        <SelectItem 
+          value="admin" 
+          className="rounded-lg text-sm font-medium text-foreground cursor-pointer py-2.5 px-3 current-color transition-colors focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary"
+        >
+          Admin
+        </SelectItem>
+      </SelectGroup>
+    </SelectContent>
+  </Select>
+</motion.div>
 
             {/* Fixed Action Submit Control using motion.div wrapper */}
             <motion.div 
