@@ -7,6 +7,7 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db('monkey');
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
 
   emailAndPassword: {
     enabled: true,
@@ -18,32 +19,35 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     },
   },
+
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
     client
   }),
 
   user: {
     additionalFields: {
       role: {
-        type: ["buyer", "seller"],
+        type: "string", 
         defaultValue: "buyer",
         input: true,
       },
       status: {
+        type: "string",
         defaultValue: 'active'
       },
       phone: {
+        type: "string",
         defaultValue: '01000000000'
       },
       address: {
+        type: "string",
         defaultValue: 'Dhaka/Bangladesh'
       }
     }
   },
 
   plugins: [jwt()],
- 
+  
   session: {
     cookieCache: {
       enabled: true,

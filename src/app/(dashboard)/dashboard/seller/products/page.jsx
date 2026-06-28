@@ -1,3 +1,4 @@
+"use client";
 import { protectedFetch } from '@/lib/core/server';
 import { getUserSession } from '@/lib/core/session';
 import React from 'react';

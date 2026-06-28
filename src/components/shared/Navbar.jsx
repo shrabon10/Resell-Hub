@@ -21,7 +21,6 @@ import {
 import SignOut from "./SignOut";
 import ScrollHeader from "./ScrollHeader";
 import WishListIcon from "./WishListIcon";
-import { LayoutGroupContext } from "framer-motion";
 
 export default async function Navbar() {
   const user = await getUserSession();
@@ -51,9 +50,10 @@ export default async function Navbar() {
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               
               <div className="flex flex-col gap-8 mt-4">
+                {/* ফিক্সড: মোবাইল ভিউতেও ক্লিক করলে যাতে হোম পেজের লোগো দেখায় এবং ড্রয়ার ক্লোজ হয় */}
                 <SheetClose asChild>
                   <div className="w-fit scale-95 origin-left">
-                    <LayoutGroupContext />
+                    <LogoText />
                   </div>
                 </SheetClose>
                 
@@ -92,7 +92,7 @@ export default async function Navbar() {
             </SheetContent>
           </Sheet>
 
-          {/* Rendered 3xl Logo */}
+          {/* Rendered 3xl Logo for Desktop */}
           <LogoText />
         </div>
 

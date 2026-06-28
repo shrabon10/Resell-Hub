@@ -3,18 +3,13 @@
 import React, { useState } from "react";
 import {
   Search,
-  UserX,
-  UserCheck,
-  Trash2,
-  Shield,
-  User,
-  ShoppingBag,
-  MoreVertical,
-  Plus,
-  AlertTriangle,
+  Check,
   X,
+  Trash2,
+  AlertTriangle,
+  Eye,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,12 +22,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -42,285 +31,258 @@ import {
 } from "@/components/ui/dialog";
 import { FadeUp } from "@/components/shared/AnimatedDiv";
 import { toast } from "react-hot-toast";
-import { deleteUser, updateRole, userStatusUpdate } from "@/lib/actions/users";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
+import DashboardPagination from "@/components/shared/DashboardPagination";
+import { adminDeleteProduct } from "@/lib/actions/products";
+import { updateProductStatus } from "@/lib/actions/users";
 
+export default function ManageProducts({ products }) {
 
-export default function ManageUsers({ users }) {
-  // const [users, setUsers] = useState(userData);
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  // Dialog and details viewing states
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
-  // Search and filter logic
-  const filteredUsers = users.filter((user) => {
+  // Filters logic
+  const filteredProducts = products.filter((prod) => {
     const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      prod.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prod.sellerInfo?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prod.category?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || prod.status === statusFilter;
 
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesStatus;
   });
 
-  // Action: Toggle Block/Unblock Status
-  const handleToggleBlock = async (id, userStatus) => {
 
-    try {
-      const data = { id, userStatus };
-      const res = await userStatusUpdate(data);
-      console.log(res);
-      if (res.modifiedCount > 0) {
+  // Action: Reject Product
+  const handleReject = async (id, status) => {
 
-        toast.success("User status updated");
-      }
-      else {
-        toast.error(res?.message || "Failed to update user");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.message || "Server error");
+    const data = {
+      id,
+      status
     }
-  };
-
-  // Action: Change User Role
-  const handleChangeRole = async (id, newRole) => {
-    console.log(id, newRole);
-    try {
-      const data = { id, newRole };
-      const res = await updateRole(data);
-      console.log(res);
-      if (res.modifiedCount > 0) {
-
-        toast.success("User role updated");
-      }
-      else {
-        toast.error(res?.message || "Failed to update user role");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.message || "Server error");
+    const res = await updateProductStatus(data);
+    if(res.matchedCount > 0){
+      setDetailsOpen(false);
+      toast.success(`product successfully update to ${status}`)
     }
+    
 
   };
 
-  // Action: Execute Deletion
-  const handleDeleteUser = async (id) => {
-    const res = await deleteUser(id);
+  // Action: Prompt Deletion
+  const confirmDelete = (prod) => {
+    setProductToDelete(prod);
+    setDeleteOpen(true);
+  };
+
+
+  // Action: Open product detail dialog
+  const handleViewDetails = (prod) => {
+    setSelectedProduct(prod);
+    setDetailsOpen(true);
+  };
+
+
+
+  // delete product
+  const handleDeleteProduct = async () => {
+    const id = productToDelete?._id
+    const res = await adminDeleteProduct(id);
     if (res.deletedCount > 0) {
-      toast.success("user delete successfully")
+      toast.success('Delete Product Successfully !')
+      setDeleteOpen(false);
+
+      setProductToDelete(null);
     }
 
-  };
+
+  }
+
+
+
 
   return (
     <div className="space-y-6">
       <FadeUp>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
-            <p className="mt-1 text-muted-foreground">
-              Monitor platform registrations, assign privileges, and moderate user accounts.
-            </p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Moderate Products</h1>
+          <p className="mt-1 text-muted-foreground">
+            Review listing requests, check reported complaints, and manage the marketplace catalog.
+          </p>
         </div>
       </FadeUp>
 
-      {/* Filters card */}
+      {/* Filter and search controls */}
       <FadeUp delay={0.05}>
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search name or email..."
+                placeholder="Search product, seller, or category..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 rounded-full bg-background"
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground font-medium">Role:</span>
-                <select
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="rounded-full border px-3 py-1.5 text-sm bg-background"
-                >
-                  <option value="all">All Roles</option>
-                  <option value="admin">Admin</option>
-                  <option value="seller">Seller</option>
-                  <option value="buyer">Buyer</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground font-medium">Status:</span>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-full border px-3 py-1.5 text-sm bg-background"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="blocked">Blocked</option>
-                </select>
-              </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">Filter Status:</span>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-full border px-3 py-1.5 text-sm bg-background w-full sm:w-auto"
+              >
+                <option value="all">All listings</option>
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
+                <option value="pending">Pending Approval</option>
+                <option value="rejected">Rejected</option>
+                <option value="reported">Reported</option>
+              </select>
             </div>
           </div>
         </Card>
       </FadeUp>
 
-      {/* Users table */}
+      {/* Products table */}
       <FadeUp delay={0.1}>
         <Card className="overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow>
-                <TableHead>User Details</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>Product Image & Name</TableHead>
+                <TableHead>Seller / Shop</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Joined Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <TableRow key={user._id} className="hover:bg-muted/10">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((prod) => (
+                  <TableRow key={prod._id} className="hover:bg-muted/10">
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage
-                            src={user?.image}
-                            alt={user?.name}
-                           
-                          />
-                          <AvatarFallback>{user.name[0]}</AvatarFallback>
-                        </Avatar>
+                      <div className="flex items-center gap-3.5">
+                        <Image
+                          width={50}
+                          height={50}
+                          src={prod.images?.[0]}
+                          alt={prod.title}
+                          className="h-11 w-11 rounded-lg object-cover border"
+                        />
                         <div>
-                          <div className="font-semibold text-sm">{user.name}</div>
-                          <div className="text-xs text-muted-foreground">{user.email}</div>
+                          <div className="font-semibold text-sm flex items-center gap-1.5">
+                            {prod.title}
+                            {prod.status === "reported" && (
+                              <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700 gap-1 text-[10px] px-1.5 py-0">
+                                <AlertTriangle className="h-3 w-3" />
+                                {prod.reports ?? 0} reports
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ID: #{prod._id?.slice(-6)} · {prod.condition}
+                          </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="align-middle">
-                      <div className="flex items-center gap-1.5">
-                        {user.role === "admin" && (
-                          <Badge variant="outline" className="gap-1 border-blue-200 bg-blue-50 text-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
-                            <Shield className="h-3 w-3" />
-                            Admin
-                          </Badge>
-                        )}
-                        {user.role === "seller" && (
-                          <Badge variant="outline" className="gap-1 border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-                            <ShoppingBag className="h-3 w-3" />
-                            Seller
-                          </Badge>
-                        )}
-                        {user.role === "buyer" && (
-                          <Badge variant="outline" className="gap-1 border-emerald-200 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
-                            <User className="h-3 w-3" />
-                            Buyer
-                          </Badge>
-                        )}
-                      </div>
+                    <TableCell className="text-sm font-medium align-middle">
+                      {prod.sellerInfo?.name}
                     </TableCell>
+                    <TableCell className="text-sm text-muted-foreground align-middle">{prod.category}</TableCell>
+                    <TableCell className="text-sm font-semibold align-middle">৳{prod.price}</TableCell>
                     <TableCell className="align-middle">
-                      {user.status === "active" ? (
+                      {prod.status === "available" && (
                         <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none dark:bg-emerald-900/40 dark:text-emerald-300">
-                          Active
+                          Available
                         </Badge>
-                      ) : (
+                      )}
+                      {prod.status === "sold" && (
+                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-none dark:bg-blue-900/40 dark:text-blue-300">
+                          Sold
+                        </Badge>
+                      )}
+                      {prod.status === "pending" && (
+                        <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 border-none dark:bg-purple-900/40 dark:text-purple-300">
+                          Pending
+                        </Badge>
+                      )}
+                      {prod.status === "rejected" && (
+                        <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-200 border-none dark:bg-gray-800 dark:text-gray-300">
+                          Rejected
+                        </Badge>
+                      )}
+                      {prod.status === "reported" && (
                         <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-200 border-none dark:bg-red-900/40 dark:text-red-300">
-                          Blocked
+                          Reported
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground align-middle">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </TableCell>
                     <TableCell className="text-right align-middle">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="rounded-full">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="cursor-pointer">
-                            {user.status === "active" ? (
-                              <>
-                                <UserX className="mr-2 h-4 w-4 text-red-600" />
-                                <div onClick={() => handleToggleBlock(user._id, user.status === "active" ? "block" : "active")} className="text-red-600 font-medium">Block User</div>
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="mr-2 h-4 w-4 text-emerald-600" />
-                                <div onClick={() => handleToggleBlock(user._id, user.status === "active" ? "block" : "active")} className="text-emerald-600 font-medium">Unblock User</div>
-                              </>
-                            )}
-                          </DropdownMenuItem>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full"
+                          title="View Details"
+                          onClick={() => handleViewDetails(prod)}
+                        >
+                          <Eye className="h-4.5 w-4.5 text-muted-foreground" />
+                        </Button>
 
-                          <DropdownMenuItem
-                            onClick={() => handleChangeRole(user._id, user.role === "buyer" ? "seller" : "buyer")}
-                            className="cursor-pointer"
+                        {prod.status !== "available" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/20"
+                            title="Approve Listing"
+                            onClick={() => handleReject(prod._id, "available")}
                           >
-                            <Shield className="mr-2 h-4 w-4" />
-                            Buyer/Seller
-                          </DropdownMenuItem>
+                            <Check className="h-4.5 w-4.5 text-emerald-600" />
+                          </Button>
+                        )}
 
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} onClick={(e) => e.stopPropagation()} className="cursor-pointer text-red-600 dark:text-red-400">
+                        {prod.status !== "rejected" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950/20"
+                            title="Reject/Unlist"
+                            onClick={() => handleReject(prod._id, "rejected")}
+                          >
+                            <X className="h-4.5 w-4.5 text-orange-600" />
 
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <div
-                                  size="sm"
-                                  variant="destructive"
-                                  className="rounded-full flex items-center gap-2"
-                                ><X />
-                                  Delete user
-                                </div>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <div className="mx-auto sm:mx-0 p-2.5 rounded-full bg-red-50 w-fit">
-                                    <AlertTriangle className="w-5 h-5 text-red-500" />
-                                  </div>
-                                  <AlertDialogTitle>Cancel Order?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to cancel{" "}
-                                    <span className="font-medium text-foreground">
-                                      {user.name}
-                                    </span>
-                                    ? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Keep Order</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteUser(user._id)}
-                                  >
-                                    Delete Account
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          </Button>
+                        )}
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                          title="Delete Listing"
+                          onClick={() => confirmDelete(prod)}
+                        >
+                          <Trash2 className="h-4.5 w-4.5 text-red-500" />
+
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No users found matching the filter criteria.
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    No products found matching filters.
                   </TableCell>
                 </TableRow>
               )}
@@ -328,6 +290,125 @@ export default function ManageUsers({ users }) {
           </Table>
         </Card>
       </FadeUp>
+
+      {/* Details Dialog */}
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Product Review Details</DialogTitle>
+          </DialogHeader>
+          {selectedProduct && (
+            <div className="space-y-4 pt-2">
+              <div className="flex gap-4">
+                <Image
+                  width={50}
+                  height={50}
+                  src={selectedProduct.images?.[0]}
+                  alt={selectedProduct.title}
+                  className="h-28 w-28 rounded-lg object-cover border"
+                />
+                <div className="space-y-1.5">
+                  <h3 className="font-semibold text-base">{selectedProduct.title}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    ID: #{selectedProduct._id?.slice(-6)}
+                  </p>
+                  <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                    Price: ৳{selectedProduct.price}
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    <Badge variant="outline">{selectedProduct.category}</Badge>
+                    <Badge variant="outline">{selectedProduct.condition}</Badge>
+                    <Badge variant="secondary">Seller: {selectedProduct.sellerInfo?.name}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground pt-1">
+                    {selectedProduct.sellerInfo?.email} · {selectedProduct.sellerInfo?.phone}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {selectedProduct.description}
+              </p>
+
+              {selectedProduct.status === "reported" && (
+                <div className="rounded-xl border border-red-200 bg-red-50/50 p-3.5 dark:bg-red-950/20">
+                  <div className="flex items-center gap-2 text-red-800 dark:text-red-400 font-semibold text-sm">
+                    <AlertTriangle className="h-4.5 w-4.5" />
+                    <span>Report Details ({selectedProduct.reports ?? 0} user reports)</span>
+                  </div>
+                  <p className="text-xs text-red-700 dark:text-red-300 mt-1.5 leading-relaxed">
+                    {selectedProduct.reportReason}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between border-t pt-4">
+                <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  Current Status:
+                  <span className="font-semibold uppercase text-foreground">{selectedProduct.status}</span>
+                </div>
+                <div className="flex gap-2">
+                  {selectedProduct.status !== "available" && (
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
+                      onClick={() => handleReject(selectedProduct._id,"available")}
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                      Approve
+                    </Button>
+                  )}
+                  {selectedProduct.status !== "rejected" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full text-orange-600 border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/20 gap-1"
+                      onClick={() => handleReject(selectedProduct._id,"rejected")}
+                    >
+                      <X className="h-3.5 w-3.5" />
+
+                      Reject
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="rounded-full bg-red-600 hover:bg-red-700 text-white gap-1"
+                    onClick={() => confirmDelete(selectedProduct)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Product Confirmation */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Delete Product Listing</DialogTitle>
+            <DialogDescription className="pt-2">
+              Are you sure you want to permanently delete the product{" "}
+              <strong className="text-foreground">{productToDelete?.title}</strong>? This listing will
+              be completely removed from all marketplace catalogs and search indexes.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 mt-4">
+            <Button variant="outline" className="rounded-full" onClick={() => setDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => handleDeleteProduct(selectedProduct?._id)} variant="destructive" className="rounded-full bg-red-600 text-white" >
+              Delete Listing
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
 
 
     </div>

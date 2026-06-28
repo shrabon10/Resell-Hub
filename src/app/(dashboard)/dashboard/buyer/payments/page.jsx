@@ -33,7 +33,9 @@ function StatusBadge({ status }) {
 
 export default async function PaymentHistoryPage() {
   const user = await getUserSession();
-  const payments = await protectedFetch(`/api/orders?userId=${user.id}`);
+  const response = await protectedFetch(`/api/orders?userId=${user.id}`);
+
+  const payments = Array.isArray(response) ? response : response?.data || [];
 
   if (!payments || payments.length === 0) {
     return <EmptyPayments />;
@@ -126,10 +128,6 @@ export default async function PaymentHistoryPage() {
           </FadeUp>
         ))}
       </div>
-
-
-
-     
     </div>
   );
 }

@@ -111,7 +111,7 @@ const SignInPage = () => {
           
           <div className="relative z-10 mt-8 space-y-3 text-center max-w-sm">
             <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
-              Welcome Back to Resell.Hub
+              Welcome Back to esell.Hub
             </h2>
             <p className="text-sm text-muted-foreground/90 leading-relaxed">
               Securely sign in to access your customized dashboard, manage metrics, and explore our latest collections.
