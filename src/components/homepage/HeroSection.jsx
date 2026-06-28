@@ -7,9 +7,21 @@ import Link from "next/link";
 export default function HeroSection() {
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden bg-background">
-      {/* Avant-garde Ambient Glow Orbs */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-pink-500/10 via-purple-500/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/10 via-emerald-500/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none" />
+      {/* Unsplash Wholesale & Supply-Chain Architectural Background */}
+      
+      {/* Avant-Garde Wholesale Logistic Dot & Isometric Mesh Matrix */}
+      <div className="absolute inset-0 bg-[radial-gradient(rgba(139,92,246,0.04)_1.5px,transparent_1.5px)] [background-size:24px_24px] -z-30" />
+      
+      {/* Architectural Supply-Chain Vector Lines */}
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none -z-20 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full [background:linear-gradient(26.5deg,transparent_49%,var(--foreground)_50%,transparent_51%)] [background-size:120px_60px]" />
+        <div className="absolute top-0 left-0 w-full h-full [background:linear-gradient(-26.5deg,transparent_49%,var(--foreground)_50%,transparent_51%)] [background-size:120px_60px]" />
+      </div>
+
+      {/* Abstract Structural Asset blocks representing stacked volume cargo */}
+      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] border border-pink-500/10 rounded-[60px] rotate-12 -z-10 pointer-events-none" />
+      <div className="absolute bottom-[-5%] left-[-5%] w-[500px] h-[500px] border border-cyan-500/10 rounded-[80px] -rotate-12 -z-10 pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-r from-purple-500/5 via-transparent to-cyan-500/5 blur-[120px] -z-10 pointer-events-none" />
 
       <div className="container mx-auto px-6">
         <div className="grid items-center gap-16 lg:grid-cols-12">
@@ -88,12 +100,18 @@ export default function HeroSection() {
                         <ShieldCheck className="h-6 w-6 text-pink-500" />
                       </div>
 
-                      <div>
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
-                          Escrow Network
-                        </p>
-                        <h3 className="text-xl font-extrabold text-foreground tracking-tight mt-0.5">
-                          98% Verified
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                          </span>
+                          <p className="text-xs font-semibold text-muted-foreground/90 tracking-wide">
+                            Escrow Network
+                          </p>
+                        </div>
+                        <h3 className="text-2xl font-bold tracking-tight text-foreground font-mono">
+                          99% <span className="text-sm font-medium text-muted-foreground">Verified</span>
                         </h3>
                       </div>
                     </div>
