@@ -44,7 +44,7 @@ export default function Footer() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#3E5F47]">
                     <ShoppingBag className="h-6 w-6 text-white" />
                   </div>
-                  <span>NeoMarket</span>
+                  <span>Resell-Hub</span>
                 </Link>
                 <p className="max-w-xs text-sm leading-relaxed text-[#B0B3A6]">
                   Your trusted circular marketplace for pre-owned electronics, furniture, and fashion. Join us in making commerce sustainable.
