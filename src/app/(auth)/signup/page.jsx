@@ -329,6 +329,7 @@ const SignUpPage = () => {
                   <SelectGroup>
                     <SelectItem value="buyer" className="rounded-lg font-medium cursor-pointer focus:bg-primary focus:text-primary-foreground">Buyer</SelectItem>
                     <SelectItem value="seller" className="rounded-lg font-medium cursor-pointer focus:bg-primary focus:text-primary-foreground">Seller</SelectItem>
+                    <SelectItem value="admin" className="rounded-lg font-medium cursor-pointer focus:bg-primary focus:text-primary-foreground">Admin</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
